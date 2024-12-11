@@ -1,0 +1,34 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "__pycache__",
+    "connexion",
+    "dataframe",
+    "DebiAI",
+    "fastapi",
+    "imshow",
+    "jsonify",
+    "numpy",
+    "pypi",
+    "pytest",
+    "systemx",
+    "uvicorn",
+    "venv"
+  ],
+  "flagWords": [],
+  "ignorePaths": [
+    "*.svg",
+    "*.json",
+    "*.png",
+    "*.yaml",
+    "*.log",
+    "*.ipynb",
+    "*.sh",
+    ".vscode/*",
+    "requirements.txt",
+    "__pycache__/",
+    "htmlcov/",
+    "venv"
+  ]
+}
