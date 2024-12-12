@@ -11,10 +11,18 @@ from typing import Optional, Union
 class DebiAIProject:
     creation_date: Optional[Union[None, str]] = None
 
+    # Project information
     def get_structure(self) -> dict:
         raise NotImplementedError
 
-    def get_data(self) -> pd.DataFrame:
+    # Project Samples
+    def get_nb_samples(self) -> Union[int, None]:
+        return None
+
+    def get_samples_ids(self) -> list[str]:
+        raise NotImplementedError
+
+    def get_data(self, samples_ids: list[str]) -> pd.DataFrame:
         raise NotImplementedError
 
 
@@ -29,6 +37,14 @@ class ProjectToExpose:
             return self.project.get_structure()
         except NotImplementedError:
             return None
+
+    def get_nb_samples(self) -> Union[int, None]:
+        nb_samples = self.project.get_nb_samples()
+
+        if nb_samples is None or not isinstance(nb_samples, int):
+            return None
+
+        return nb_samples
 
     def get_data(self) -> pd.DataFrame:
         try:
@@ -48,11 +64,10 @@ class ProjectToExpose:
 
     # Project information
     def get_overview(self) -> ProjectOverview:
-        try:
-            nbSamples = self.project.get_data().shape[0]
-        except NotImplementedError:
-            nbSamples = 0
+        # Get the number of samples
+        nbSamples = self.get_nb_samples()
 
+        # Get the creation date
         creationDate = None
         if self.project.creation_date is not None and isinstance(
             self.project.creation_date, str
@@ -70,10 +85,11 @@ class ProjectToExpose:
         )
 
     def get_details(self) -> ProjectDetails:
-        try:
-            structure = self.project.get_structure()
-        except NotImplementedError:
-            structure = None
+        # Get the number of samples
+        nbSamples = self.get_nb_samples()
+
+        # Construct the project columns
+        structure = self.get_structure()
 
         columns = []
         if structure:
@@ -91,7 +107,7 @@ class ProjectToExpose:
             name=self.project_name,
             columns=columns,
             expectedResults=[],
-            nbSamples=None,
+            nbSamples=nbSamples,
             creationDate=None,
             updateDate=None,
         )
@@ -117,12 +133,9 @@ class ProjectToExpose:
                 )
             table.add_row("", "")
 
-        # Display the project data shape
-        data = self.get_data()
-        data_columns_text = "\n".join(data.columns)
-        table.add_row("Data:", "")
-        table.add_row("Shape:", str(data.shape))
-        table.add_row("Columns:", data_columns_text)
-        table.add_row("", "")
+        # Display the project data number of samples
+        nb_samples = self.get_nb_samples()
+        if nb_samples is not None:
+            table.add_row("NB samples:", f"{nb_samples}")
 
         return table
