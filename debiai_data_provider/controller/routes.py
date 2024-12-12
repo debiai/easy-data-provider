@@ -68,8 +68,10 @@ def get_data_id_list(
     analysisId: Optional[str] = Query(None),
     analysisStart: Optional[bool] = Query(None),
     analysisEnd: Optional[bool] = Query(None),
+    data_provider: DataProvider = Depends(get_data_provider),
 ):
-    return []
+    project = data_provider._get_project_to_expose(projectId)
+    return project.get_data_id_list(from_, to, analysisId, analysisStart, analysisEnd)
 
 
 @router.post(
@@ -77,11 +79,13 @@ def get_data_id_list(
     response_model=Dict[str, List[Union[str, int, float]]],
     tags=["Data"],
 )
-def post_data(
+def get_data(
     projectId: str = Path(..., min_length=1, example="Project 1"),
-    body: List[Union[str, int, float]] = Body(...),
+    samples_ids: List[Union[str, int, float]] = Body(...),
+    data_provider: DataProvider = Depends(get_data_provider),
 ):
-    return {}
+    project = data_provider._get_project_to_expose(projectId)
+    return project.get_data_from_ids(samples_ids)
 
 
 # Model routes
