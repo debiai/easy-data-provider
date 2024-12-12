@@ -35,10 +35,7 @@ def get_info():
 @router.get("/projects", response_model=Dict[str, ProjectOverview], tags=["Projects"])
 def get_projects(data_provider: DataProvider = Depends(get_data_provider)):
     debiai_projects = data_provider.projects
-    return {
-        project.project_name: project.get_overview()
-        for project in debiai_projects
-    }
+    return {project.project_name: project.get_overview() for project in debiai_projects}
 
 
 @router.get("/projects/{projectId}", response_model=ProjectDetails, tags=["Projects"])
@@ -50,7 +47,11 @@ def get_project(
 
 
 @router.delete("/projects/{projectId}", status_code=200, tags=["Projects"])
-def delete_project(projectId: str = Path(..., min_length=1, example="Project 1")):
+def delete_project(
+    projectId: str = Path(..., min_length=1, example="Project 1"),
+    data_provider: DataProvider = Depends(get_data_provider),
+):
+    data_provider.delete_project(projectId)
     return {"message": "Project deleted"}
 
 

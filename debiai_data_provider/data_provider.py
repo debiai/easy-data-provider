@@ -60,6 +60,38 @@ class DataProvider:
         """
         return [project.project for project in self.projects]
 
+    def get_project(self, project_name: str) -> DebiAIProject:
+        """
+        Get a project by its name.
+
+        Parameters:
+            project_name (str): The name of the project.
+
+        Returns:
+            DebiAIProject: The project.
+        """
+        return self._get_project_to_expose(project_name).project
+
+    def delete_project(self, project_name: str):
+        """
+        Deletes a project from the data-provider.
+
+        Parameters:
+            project_name (str): The name of the project to delete.
+        """
+        project_to_delete = self.get_project(project_name)
+        try:
+            project_to_delete.delete_project()
+            self.projects = [
+                project
+                for project in self.projects
+                if project.project_name != project_name
+            ]
+        except NotImplementedError:
+            print(
+                f"Project '{project_name}' does not implement the delete_project method."
+            )
+
     def _get_project_to_expose(self, project_name: str) -> ProjectToExpose:
         """
         Get a project by its name.

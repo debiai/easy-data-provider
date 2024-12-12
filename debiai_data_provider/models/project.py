@@ -15,6 +15,10 @@ class DebiAIProject:
     def get_structure(self) -> dict:
         raise NotImplementedError
 
+    # Project actions
+    def delete_project(self):
+        raise NotImplementedError
+
     # Project Samples
     def get_nb_samples(self) -> Union[int, None]:
         return None
