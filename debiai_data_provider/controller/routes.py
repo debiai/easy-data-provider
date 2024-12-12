@@ -5,7 +5,7 @@ from debiai_data_provider.models.debiai import (
     InfoResponse,
     CanDelete,
     ProjectOverview,
-    ProjectDetail,
+    ProjectDetails,
     ModelDetail,
     SelectionRequest,
 )
@@ -36,14 +36,17 @@ def get_info():
 def get_projects(data_provider: DataProvider = Depends(get_data_provider)):
     debiai_projects = data_provider.projects
     return {
-        project.project_name: project.project.get_overview()
+        project.project_name: project.get_overview()
         for project in debiai_projects
     }
 
 
-@router.get("/projects/{projectId}", response_model=ProjectDetail, tags=["Projects"])
-def get_project(projectId: str = Path(..., min_length=1, example="Project 1")):
-    return {}
+@router.get("/projects/{projectId}", response_model=ProjectDetails, tags=["Projects"])
+def get_project(
+    projectId: str = Path(..., min_length=1, example="Project 1"),
+    data_provider: DataProvider = Depends(get_data_provider),
+):
+    return data_provider._get_project_to_expose(projectId).get_details()
 
 
 @router.delete("/projects/{projectId}", status_code=200, tags=["Projects"])

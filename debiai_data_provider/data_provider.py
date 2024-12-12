@@ -9,6 +9,29 @@ class DataProvider:
     def __init__(self):
         self.projects: List[ProjectToExpose] = []
 
+    def start_server(self, host="0.0.0.0", port=8000):
+        from debiai_data_provider.app import start_api_server
+
+        # Print the server information
+        console = Console()
+        console.print(
+            Panel(
+                "The Data Provider is being started..."
+                + f"\n\n[bold]API Server[/bold]: http://{host}:{port}"
+                + f"\n[bold]Number of Projects[/bold]: {len(self.get_projects())}",
+                title="DebiAI Data Provider",
+                width=80,
+                border_style="bold",
+            )
+        )
+
+        # Print the details of each project
+        for project in self.projects:
+            console.print(project.get_rich_table())
+
+        start_api_server(self, host, port)
+
+    # Projects
     def add_project(
         self,
         project: DebiAIProject,
@@ -37,24 +60,18 @@ class DataProvider:
         """
         return [project.project for project in self.projects]
 
-    def start_server(self, host="0.0.0.0", port=8000):
-        from debiai_data_provider.app import start_api_server
+    def _get_project_to_expose(self, project_name: str) -> ProjectToExpose:
+        """
+        Get a project by its name.
 
-        # Print the server information
-        console = Console()
-        console.print(
-            Panel(
-                "The Data Provider is being started..."
-                + f"\n\n[bold]API Server[/bold]: http://{host}:{port}"
-                + f"\n[bold]Number of Projects[/bold]: {len(self.get_projects())}",
-                title="DebiAI Data Provider",
-                width=80,
-                border_style="bold",
-            )
-        )
+        Parameters:
+            project_name (str): The name of the project.
 
-        # Print the details of each project
-        for project in self.get_projects():
-            console.print(project.get_details())
+        Returns:
+            ProjectToExpose: The project to expose.
+        """
+        for project in self.projects:
+            if project.project_name == project_name:
+                return project
 
-        start_api_server(self, host, port)
+        raise ValueError(f"Project '{project_name}' not found.")

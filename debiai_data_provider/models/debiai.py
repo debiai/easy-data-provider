@@ -38,7 +38,7 @@ class ExpectedResult(BaseModel):
     group: Optional[str] = ""
 
 
-class ProjectDetail(BaseModel):
+class ProjectDetails(BaseModel):
     name: Optional[str]
     columns: List[Column]
     expectedResults: List[ExpectedResult]
