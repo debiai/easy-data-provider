@@ -1,7 +1,6 @@
 from typing import List
 from debiai_data_provider.utils.parser import extract_project_metadata
 from debiai_data_provider.models.project import DebiAIProject, ProjectToExpose
-from debiai_data_provider.app import start_api_server
 from rich.console import Console
 from rich.panel import Panel
 
@@ -39,6 +38,8 @@ class DataProvider:
         return [project.project for project in self.projects]
 
     def start_server(self, host="0.0.0.0", port=8000):
+        from debiai_data_provider.app import start_api_server
+
         # Print the server information
         console = Console()
         console.print(

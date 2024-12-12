@@ -1,5 +1,8 @@
 import pandas as pd
 from rich.table import Table
+from debiai_data_provider.models.debiai import (
+    ProjectOverview,
+)
 
 
 class DebiAIProject:
@@ -47,6 +50,16 @@ class DebiAIProject:
             table.add_row("", "")
 
         return table
+
+    def get_overview(self) -> ProjectOverview:
+        return ProjectOverview(
+            name=self.__class__.__name__,
+            nbSamples=self.get_data().shape[0],
+            nbModels=0,
+            nbSelections=0,
+            creationDate=0,
+            updateDate=0,
+        )
 
 
 class ProjectToExpose:
