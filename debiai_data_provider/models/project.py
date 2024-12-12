@@ -3,9 +3,12 @@ from rich.table import Table
 from debiai_data_provider.models.debiai import (
     ProjectOverview,
 )
+from typing import Optional, Union
 
 
 class DebiAIProject:
+    creation_date: Optional[Union[None, str]] = None
+
     def get_structure(self) -> dict:
         raise NotImplementedError
 
@@ -52,13 +55,23 @@ class DebiAIProject:
         return table
 
     def get_overview(self) -> ProjectOverview:
+        try:
+            nbSamples = self.get_data().shape[0]
+        except NotImplementedError:
+            nbSamples = 0
+
+        creationDate = None
+        if self.creation_date is not None and isinstance(self.creation_date, str):
+            # Convert the creation date to a timestamp
+            creationDate = pd.Timestamp(self.creation_date).timestamp() * 1000
+
         return ProjectOverview(
             name=self.__class__.__name__,
-            nbSamples=self.get_data().shape[0],
-            nbModels=0,
-            nbSelections=0,
-            creationDate=0,
-            updateDate=0,
+            nbSamples=nbSamples,
+            nbModels=None,
+            nbSelections=None,
+            creationDate=creationDate,
+            updateDate=None,
         )
 
 
