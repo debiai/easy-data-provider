@@ -63,7 +63,7 @@ def delete_project(
 )
 def get_data_id_list(
     projectId: str = Path(..., min_length=1, example="Project 1"),
-    from_: Optional[int] = Query(None),
+    from_: Optional[int] = Query(None, alias="from"),
     to: Optional[int] = Query(None),
     analysisId: Optional[str] = Query(None),
     analysisStart: Optional[bool] = Query(None),
@@ -76,7 +76,7 @@ def get_data_id_list(
 
 @router.post(
     "/projects/{projectId}/data",
-    response_model=Dict[str, List[Union[str, int, float]]],
+    response_model=Dict[Union[str, int], List[Union[str, int, float, bool, None, list, dict]]],
     tags=["Data"],
 )
 def get_data(

@@ -23,9 +23,20 @@ def dataframe_to_debiai_data_array(
         sample_data = []
 
         for column in columns:
-            sample_data.append(
-                data.loc[data["Data ID"] == sample_id, column.name].values[0]
-            )
+            try:
+                if "Data ID" in data.columns:
+                    sample_to_add = data.loc[
+                        data["Data ID"] == sample_id, column.name
+                    ].values[0]
+                else:
+                    # Use the dataframe index as the sample ID
+                    sample_to_add = data.loc[sample_id, column.name]
+            except KeyError:
+                raise KeyError(
+                    f"Column '{column.name}' of the sample '{sample_id}' not found in the data."
+                )
+
+            sample_data.append(sample_to_add)
 
         sample_dicts[sample_id] = sample_data
 

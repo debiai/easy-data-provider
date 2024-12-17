@@ -193,13 +193,15 @@ class ProjectToExpose:
     ) -> list[str]:
         samples_ids = self.get_samples_ids()
 
-        if from_ is not None:
+        if from_ is not None and to is not None:
+            samples_ids = samples_ids[from_ : to + 1]  # noqa
+
+        elif from_ is not None:
             samples_ids = samples_ids[from_:]
 
-        if to is not None:
-            samples_ids = samples_ids[:to]
+        elif to is not None:
+            samples_ids = samples_ids[: to + 1]
 
-        print(samples_ids)
         return samples_ids
 
     def get_data_from_ids(self, samples_ids: list[str]) -> dict:
@@ -207,6 +209,16 @@ class ProjectToExpose:
 
         # Get the data from the project
         df_data = self.project.get_data(samples_ids)
+
+        # Create a copy of the dataframe
+        df_data = df_data.copy()
+
+        # Verify that all the columns are in the dataframe
+        columns = self.get_columns()
+        for column in columns:
+            if column.name not in df_data.columns:
+                # Add the column to the dataframe
+                df_data[column.name] = None
 
         return dataframe_to_debiai_data_array(
             columns=self.get_columns(), samples_id=samples_ids, data=df_data
