@@ -28,8 +28,8 @@ class ProjectOverview(BaseModel):
 class Column(BaseModel):
     name: str
     category: str = "other"
-    type: str = "auto"
-    group: Optional[str] = ""
+    type: Optional[str] = "auto"
+    group: Optional[str] = None
 
 
 class ExpectedResult(BaseModel):

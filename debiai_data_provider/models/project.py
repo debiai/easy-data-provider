@@ -10,6 +10,7 @@ from typing import Optional, Union
 
 class DebiAIProject:
     creation_date: Optional[Union[None, str]] = None
+    name: Optional[str] = None
 
     # Project information
     def get_structure(self) -> dict:
@@ -78,7 +79,7 @@ class ProjectToExpose:
                         f"Error in the structure of the column '{key}', the 'type' must be a string."
                     )
 
-                VALID_TYPES = ["text", "number", "bool", "dict", "list"]
+                VALID_TYPES = ["text", "number", "bool", "dict", "list", "auto"]
                 if value["type"] not in VALID_TYPES:
                     raise ValueError(
                         f"Error in the structure of the column '{key}', the 'type' must be "

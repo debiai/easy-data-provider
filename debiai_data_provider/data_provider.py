@@ -1,5 +1,5 @@
 from typing import List
-from debiai_data_provider.utils.parser import extract_project_metadata
+from debiai_data_provider.utils.parser import extract_project_class_name
 from debiai_data_provider.models.project import DebiAIProject, ProjectToExpose
 from rich.console import Console
 from rich.panel import Panel
@@ -42,12 +42,15 @@ class DataProvider:
         Parameters:
             project (DebiAIProject): The instance of the DebiAIProject class.
         """
-        project_metadata = extract_project_metadata(project)
+        if project.name:
+            project_name = project.name
+        else:
+            project_name = extract_project_class_name(project)
 
         self.projects.append(
             ProjectToExpose(
                 project=project,
-                project_name=project_metadata["name"],
+                project_name=project_name,
             )
         )
 

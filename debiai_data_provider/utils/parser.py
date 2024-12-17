@@ -4,13 +4,9 @@ import pandas as pd
 from typing import List
 
 
-def extract_project_metadata(project: DebiAIProject) -> dict:
+def extract_project_class_name(project: DebiAIProject) -> str:
     # Get the class name
-    class_name = project.__class__.__name__
-
-    return {
-        "name": class_name,
-    }
+    return project.__class__.__name__
 
 
 def dataframe_to_debiai_data_array(
