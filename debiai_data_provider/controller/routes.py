@@ -76,7 +76,9 @@ def get_data_id_list(
 
 @router.post(
     "/projects/{projectId}/data",
-    response_model=Dict[Union[str, int], List[Union[str, int, float, bool, None, list, dict]]],
+    response_model=Dict[
+        Union[str, int], List[Union[str, int, float, bool, None, list, dict]]
+    ],
     tags=["Data"],
 )
 def get_data(
@@ -94,21 +96,41 @@ def get_data(
     response_model=List[ModelDetail],
     tags=["Models"],
 )
-def get_models(projectId: str = Path(..., min_length=1, example="Project 1")):
-    return []
+def get_models(
+    projectId: str = Path(..., min_length=1, example="Project 1"),
+    data_provider: DataProvider = Depends(get_data_provider),
+):
+    project = data_provider._get_project_to_expose(projectId)
+    return project.get_models()
+
+
+@router.get(
+    "/projects/{projectId}/models/{modelId}/evaluated-data-id-list",
+    response_model=List[Union[str, int]],
+    tags=["Models"],
+)
+def get_models_evaluated_data_id_list(
+    projectId: str = Path(..., min_length=1, example="Project 1"),
+    modelId: str = Path(..., min_length=1, example="Model 1"),
+    data_provider: DataProvider = Depends(get_data_provider),
+):
+    project = data_provider._get_project_to_expose(projectId)
+    return project.get_model_evaluated_data_id_list(modelId)
 
 
 @router.post(
     "/projects/{projectId}/models/{modelId}/results",
-    response_model=Dict[str, List[Union[str, int, float, bool]]],
+    response_model=Dict[Union[str, int], List[Union[str, int, float, bool]]],
     tags=["Models"],
 )
-def post_model_results(
+def get_model_results(
     projectId: str = Path(..., min_length=1, example="Project 1"),
     modelId: str = Path(..., min_length=1, example="Model 1"),
     body: List[Union[str, int, float]] = Body(...),
+    data_provider: DataProvider = Depends(get_data_provider),
 ):
-    return {}
+    project = data_provider._get_project_to_expose(projectId)
+    return project.get_model_results(modelId, body)
 
 
 @router.delete(
