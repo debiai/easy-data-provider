@@ -19,8 +19,8 @@ class DebiAIProject:
     def get_structure(self) -> dict:
         raise NotImplementedError
 
-    def get_results_structure(self) -> list[dict]:
-        return []
+    def get_results_structure(self) -> dict:
+        return {}
 
     # Project actions
     def delete_project(self):
@@ -86,7 +86,7 @@ class ProjectToExpose:
                     "other",
                 ]:
                     raise ValueError(
-                        f"Error in the structure of the column '{key}', the 'category' must be 'context', 'input', 'groundtruth' or 'other'." # noqa
+                        f"Error in the structure of the column '{key}', the 'category' must be 'context', 'input', 'groundtruth' or 'other'."  # noqa
                     )
 
             if "type" in value:
@@ -142,46 +142,58 @@ class ProjectToExpose:
         except NotImplementedError:
             return None
 
-        if not isinstance(structure, list):
+        if not isinstance(structure, dict):
             raise ValueError(
-                "The 'get_results_structure' method must return a list of dictionaries."  # noqa
+                "The 'get_results_structure' method must return a dictionary."
             )
 
         structure = structure.copy()
 
-        for value in structure:
+        for key, value in structure.items():
             if not isinstance(value, dict):
                 raise ValueError(
-                    "Error in the structure of the column, it must be a dictionary."  # noqa
+                    f"Error in the structure of the column '{key}', it must be a dictionary."
                 )
 
-            if "name" not in value:
-                raise ValueError(
-                    "The 'name' key is missing in the column structure."
-                )  # noqa
-
-            if not isinstance(value["name"], str):
-                raise ValueError("The 'name' key must be a string.")
-
-            if "type" not in value:
-                # Set the default type to "auto"
-                value["type"] = "auto"
-            else:
+            if "type" in value:
                 if not isinstance(value["type"], str):
-                    raise ValueError("The 'type' key must be a string.")
+                    raise ValueError(
+                        f"Error in the structure of the column '{key}', the 'type' must be a string."
+                    )
 
                 VALID_TYPES = ["text", "number", "bool", "dict", "list", "auto"]
                 if value["type"] not in VALID_TYPES:
                     raise ValueError(
-                        "The 'type' key must be " + ", ".join(VALID_TYPES) + "."
+                        f"Error in the structure of the column '{key}', the 'type' must be "
+                        + ", ".join(VALID_TYPES)
+                        + "."
                     )
+
+            if "group" in value:
+                if not isinstance(value["group"], str):
+                    raise ValueError(
+                        f"Error in the structure of the column '{key}', the 'group' must be a string."
+                    )
+        # Convert:
+        # {
+        #     "col_name": {
+        #         "type": "text",
+        #         "group": "context",
+        #     },
+        #     ...
+        # }
+        # to:
+        # [
+        #     ExpectedResult(name="col_name", type="text", group="context"),
+        # ]
+
         columns = []
-        for value in structure:
+        for key, value in structure.items():
             columns.append(
                 ExpectedResult(
-                    name=value["name"],
+                    name=key,
                     type=value["type"],
-                    group="",
+                    group=value.get("group", ""),
                 )
             )
 
@@ -423,11 +435,12 @@ class ProjectToExpose:
         nb_samples = self.get_nb_samples()
         if nb_samples is not None:
             table.add_row("NB samples:", f"{nb_samples}")
+            table.add_row("", "")
 
         # Display the project results structure
         results_columns = self.get_results_columns()
         if results_columns:
-            table.add_row("Results structure:", "")
+            table.add_row("Results:", "")
             for column in results_columns:
                 column_value = f"[bold blue]{column.type}[/bold blue] "
                 if column.group:
