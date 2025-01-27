@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-This DebiAI Data Provider Python module allows you to easily deploy your own data-provider through the data-provider API.
+This [DebiAI](https://debiai.irt-systemx.fr/) Data Provider Python module allows you to easily deploy your own data-provider through the data-provider API.
 
 A data-provider allows you to provide data to DebiAI so that no duplication of data is needed.
 
@@ -164,26 +164,36 @@ class MyProject(DebiAIProject):
         return model_inferences
 ```
 
-#### Provide project selections
+## Roadmap
 
-TODO
+- [ ] Publish to Pypi
+- [ ] Provide project data
+  - [x] Provide project metadata
+  - [x] Provide project samples
+  - [x] Provide project models & model results
+  - [ ] Provide project selections
+- [ ] Make available project interactions
+  - [x] Project deletion
+  - [ ] Model deletion
+  - [ ] Selection creation
+  - [ ] Selection deletion
+- [ ] High level data-providers
+  - [ ] CSV data-provider
+  - [ ] Json data-provider
+- [ ] Start DebiAI along with the data-provider
+- [ ] LLM improved data-provider for auto configuration
 
-### Listen for user interactions
+---
 
-TODO
+<p align="center">
+  DebiAI is developed by 
+  <a href="https://www.irt-systemx.fr/" title="IRT SystemX">
+   <img src="https://www.irt-systemx.fr/wp-content/uploads/2013/03/system-x-logo.jpeg"  height="70">
+  </a>
+  And is integrated in 
+  <a href="https://www.confiance.ai/" title="Confiance.ai">
+   <img src="https://pbs.twimg.com/profile_images/1443838558549258264/EvWlv1Vq_400x400.jpg"  height="70">
+  </a>
+</p>
 
-#### Project deletion
-
-TODO
-
-#### Selection creation
-
-TODO
-
-#### Selection deletion
-
-TODO
-
-#### Model deletion
-
-TODO
+---
