@@ -84,7 +84,7 @@ To link your data-provider with DebiAI, you can follow our [Creation of a data p
 
 #### Provide project model results
 
-To prodive your model results to DebiAI, add the following method to your project class:
+To provide your model results to DebiAI, add the following method to your project class:
 
 ```python
 class MyProject(DebiAIProject):
