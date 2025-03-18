@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from debiai_data_provider.app import APP_VERSION
+from debiai_data_provider.version import VERSION
 
 # Import the README and use it as the long description
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 # Setup the package
 setup(
     name="debiai_data_provider",
-    version=APP_VERSION,
+    version=VERSION,
     description="Start your own Data-provider from simple Python",
     long_description=long_description,
     long_description_content_type="text/markdown",

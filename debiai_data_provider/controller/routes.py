@@ -9,7 +9,7 @@ from debiai_data_provider.models.debiai import (
     ModelDetail,
     SelectionRequest,
 )
-from debiai_data_provider.app import APP_VERSION
+from debiai_data_provider.version import VERSION
 from debiai_data_provider.data_provider import DataProvider
 
 router = APIRouter()
@@ -23,7 +23,7 @@ def get_data_provider(request: Request):
 @router.get("/info", response_model=InfoResponse, tags=["Info"])
 def get_info():
     return InfoResponse(
-        version=APP_VERSION,
+        version=VERSION,
         maxSampleIdByRequest=10000,
         maxSampleDataByRequest=2000,
         maxResultByRequest=5000,

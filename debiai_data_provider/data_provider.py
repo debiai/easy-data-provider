@@ -1,6 +1,7 @@
 from typing import List
 from debiai_data_provider.utils.parser import extract_project_class_name
 from debiai_data_provider.models.project import DebiAIProject, ProjectToExpose
+from debiai_data_provider.version import VERSION
 from rich.console import Console
 from rich.panel import Panel
 
@@ -19,7 +20,7 @@ class DataProvider:
                 "The Data Provider is being started..."
                 + f"\n\n[bold]API Server[/bold]: http://{host}:{port}"
                 + f"\n[bold]Number of Projects[/bold]: {len(self.get_projects())}",
-                title="DebiAI Data Provider",
+                title=f"DebiAI Data Provider v{VERSION}",
                 width=80,
                 border_style="bold",
             )

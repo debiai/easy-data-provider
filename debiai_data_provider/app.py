@@ -1,6 +1,5 @@
 from debiai_data_provider.data_provider import DataProvider
-
-APP_VERSION = "1.0.1"
+from debiai_data_provider.version import VERSION
 
 
 def start_api_server(data_provider: DataProvider, host, port):
@@ -11,7 +10,7 @@ def start_api_server(data_provider: DataProvider, host, port):
 
     app = FastAPI(
         title="DebiAI Data-provider API",
-        version=APP_VERSION,
+        version=VERSION,
         description="API for DebiAI data providers",
     )
 
