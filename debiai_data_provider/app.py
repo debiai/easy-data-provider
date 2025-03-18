@@ -1,6 +1,6 @@
 from debiai_data_provider.data_provider import DataProvider
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1"
 
 
 def start_api_server(data_provider: DataProvider, host, port):
