@@ -4,8 +4,8 @@ from debiai_data_provider import DebiAIProject, DataProvider
 # This file is an example of a simple project
 # exposed with the DebiAI Data Provider python module.
 # It shows how to define a project structure,
-# provide project data and model results,
-# and define actions that can be performed on the project.
+# provide project data and define actions
+# that can be performed on the project.
 
 # Project data
 PROJECT_DATA = pd.DataFrame(
@@ -15,18 +15,6 @@ PROJECT_DATA = pd.DataFrame(
         "My context 2": [0.28, 0.388, 0.5],
         "My groundtruth 1": [8, 7, 19],
         "input": [100, 200, 128],
-    }
-)
-
-# Project model results
-MODEL_RESULTS = pd.DataFrame(
-    {
-        "sample_id": ["image-1", "image-1", "image-2", "image-2"],
-        "model": ["model_1", "model_2", "model_1", "model_2"],
-        "prediction": [10, 12, 8, 5],
-        "confidence": [0.8, 0.9, 0.7, 0.6],
-        "error": [2, 4, 1, -2],
-        "error_abs": [2, 4, 1, 2],
     }
 )
 
@@ -45,42 +33,13 @@ class MyProject(DebiAIProject):
         # It serves to classify the project data structure
 
         return {
-            "My context 1": {
-                "type": "text",
-                "category": "context",
-                "group": "context",
-            },
+            "My context 1": {"type": "text", "category": "context", "group": "context"},
             "My context 2": {
                 "type": "number",
                 "category": "context",
                 "group": "context",
             },
-            "My groundtruth 1": {
-                "type": "number",
-                "category": "groundtruth",
-            },
-        }
-
-    def get_results_structure(self) -> dict:
-        # This function will be called when the user
-        # opens the project in the DebiAI interface
-        # It is required if you plan to analyze model results
-
-        return {
-            "prediction": {
-                "type": "number",
-            },
-            "confidence": {
-                "type": "number",
-            },
-            "error": {
-                "type": "number",
-                "group": "error",
-            },
-            "error_abs": {
-                "type": "number",
-                "group": "error",
-            },
+            "My groundtruth 1": {"type": "number", "category": "groundtruth"},
         }
 
     # Project samples
@@ -100,57 +59,6 @@ class MyProject(DebiAIProject):
         # containing the data corresponding to the samples_ids
 
         return PROJECT_DATA[PROJECT_DATA["Data ID"].isin(samples_ids)]
-
-    # Project model results
-    def get_models(self) -> list[dict]:
-        # This function will be called when DebiAI
-        # ask the user to select a model to analyze the results
-        # The function should return the list of models
-        # that have been evaluated on the project
-
-        unique_models = MODEL_RESULTS["model"].unique()
-
-        models_data = []
-        for model in unique_models:
-            nb_results = len(MODEL_RESULTS[MODEL_RESULTS["model"] == model])
-
-            models_data.append(
-                {
-                    "id": model,
-                    "name": model,
-                    "nb_results": nb_results,
-                }
-            )
-
-        return models_data
-
-    def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
-        # This function will be called when the user
-        # wants to analyze the results of a specific model
-        # The function should return the list of samples ids
-        # that have been evaluated by the model
-
-        unique_models = MODEL_RESULTS["model"].unique()
-
-        if model_id not in unique_models:
-            raise ValueError(f"Model {model_id} not found")
-
-        return MODEL_RESULTS[MODEL_RESULTS["model"] == model_id]["sample_id"].tolist()
-
-    def get_model_results(self, model_id: str, samples_ids: list[str]) -> pd.DataFrame:
-        # This function will be called when the user
-        # wants to analyze the results of a specific model
-        # The function should return a pandas DataFrame
-        # containing the results of the model corresponding
-        # to the samples_ids provided
-
-        # Filter the results
-        model_inferences = MODEL_RESULTS[
-            (MODEL_RESULTS["model"] == model_id)
-            & (MODEL_RESULTS["sample_id"].isin(samples_ids))
-        ]
-
-        return model_inferences
 
     # Project actions
     def delete_project(self):
