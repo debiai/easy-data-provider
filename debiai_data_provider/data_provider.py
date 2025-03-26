@@ -10,7 +10,7 @@ class DataProvider:
     def __init__(self):
         self.projects: List[ProjectToExpose] = []
 
-    def start_server(self, host="0.0.0.0", port=8000):
+    def start_server(self, host="0.0.0.0", port=8000, auto_reload=False):
         from debiai_data_provider.app import start_api_server
 
         # Print the server information
@@ -30,7 +30,7 @@ class DataProvider:
         for project in self.projects:
             console.print(project.get_rich_table())
 
-        start_api_server(self, host, port)
+        start_api_server(self, host, port, auto_reload)
 
     # Projects
     def add_project(
