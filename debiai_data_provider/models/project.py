@@ -144,7 +144,8 @@ class ProjectToExpose:
 
         if not isinstance(structure, dict):
             raise ValueError(
-                "The 'get_results_structure' method must return a dictionary."
+                f'The "get_results_structure" method must return a dictionary, got {type(structure)}.\n\
+Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
             )
 
         structure = structure.copy()
