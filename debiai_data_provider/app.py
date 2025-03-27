@@ -2,7 +2,7 @@ from debiai_data_provider.data_provider import DataProvider
 from debiai_data_provider.version import VERSION
 
 
-def start_api_server(data_provider: DataProvider, host, port, auto_reload=False):
+def start_api_server(data_provider: DataProvider, host, port):
     import uvicorn
     from fastapi import FastAPI
     from fastapi.middleware.cors import CORSMiddleware
@@ -26,4 +26,4 @@ def start_api_server(data_provider: DataProvider, host, port, auto_reload=False)
 
     app.include_router(controller_router)
 
-    uvicorn.run(app, host=host, port=port, reload=auto_reload)
+    uvicorn.run(app, host=host, port=port)

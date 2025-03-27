@@ -79,4 +79,4 @@ provider.add_project(MyProject())
 provider.add_project(MyProject2())
 
 # Finally, start the server
-provider.start_server(auto_reload=True)
+provider.start_server()
