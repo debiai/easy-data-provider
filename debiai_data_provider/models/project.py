@@ -7,7 +7,7 @@ from debiai_data_provider.models.debiai import (
     Column,
     ExpectedResult,
 )
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Tuple
 
 
 class DebiAIProject:
@@ -226,7 +226,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         return samples_id
 
     # Project information
-    def get_dates(self) -> tuple[Optional[int], Optional[int]]:
+    def get_dates(self) -> Tuple[Optional[int], Optional[int]]:
         # Get the creation date
         creationDate = None
         if self.project.creation_date is not None and isinstance(
