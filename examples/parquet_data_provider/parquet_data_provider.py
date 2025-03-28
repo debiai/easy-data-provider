@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from debiai_data_provider import DebiAIProject, DataProvider
+from typing import List
 
 # This file presents an example of implementation for
 # a parquet DebiAI Data-provider project.
@@ -58,12 +59,12 @@ class ParquetDataProviderProject(DebiAIProject):
         # This function returns the number of samples in the project
         return len(self.get_project_parquet())
 
-    def get_samples_ids(self) -> list[str]:
+    def get_samples_ids(self) -> List[str]:
         # This function returns the list of samples ids
         project_data = self.data
         return project_data[PARQUET_ID_COLUMN].tolist()
 
-    def get_data(self, samples_ids: list[str]) -> pd.DataFrame:
+    def get_data(self, samples_ids: List[str]) -> pd.DataFrame:
         # This function will be called when the user
         # wants to analyze data from your project
 

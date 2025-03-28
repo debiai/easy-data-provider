@@ -7,7 +7,7 @@ from debiai_data_provider.models.debiai import (
     Column,
     ExpectedResult,
 )
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 
 class DebiAIProject:
@@ -30,20 +30,20 @@ class DebiAIProject:
     def get_nb_samples(self) -> Union[int, None]:
         return None
 
-    def get_samples_ids(self) -> list[str]:
+    def get_samples_ids(self) -> List[str]:
         raise NotImplementedError
 
-    def get_data(self, samples_ids: list[str]) -> pd.DataFrame:
+    def get_data(self, samples_ids: List[str]) -> pd.DataFrame:
         raise NotImplementedError
 
     # Project models
     def get_models(self) -> list[ModelDetail]:
         return []
 
-    def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
+    def get_model_evaluated_data_id_list(self, model_id: str) -> List[str]:
         raise NotImplementedError
 
-    def get_model_results(self, model_id: str, sample_ids: list[str]) -> pd.DataFrame:
+    def get_model_results(self, model_id: str, sample_ids: List[str]) -> pd.DataFrame:
         raise NotImplementedError
 
 
@@ -208,7 +208,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
         return nb_samples
 
-    def get_samples_ids(self) -> list[str]:
+    def get_samples_ids(self) -> List[str]:
         try:
             samples_id = self.project.get_samples_ids()
         except NotImplementedError:
@@ -292,7 +292,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         analysisId: Optional[str] = None,
         analysisStart: Optional[bool] = None,
         analysisEnd: Optional[bool] = None,
-    ) -> list[str]:
+    ) -> List[str]:
         samples_ids = self.get_samples_ids()
 
         if from_ is not None and to is not None:
@@ -306,7 +306,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
         return samples_ids
 
-    def get_data_from_ids(self, samples_ids: list[str]) -> dict:
+    def get_data_from_ids(self, samples_ids: List[str]) -> dict:
         from debiai_data_provider.utils.parser import dataframe_to_debiai_data_array
 
         # Get the data from the project
@@ -352,11 +352,11 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
         return model_details
 
-    def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
+    def get_model_evaluated_data_id_list(self, model_id: str) -> List[str]:
         return self.project.get_model_evaluated_data_id_list(model_id)
 
     def get_model_results(
-        self, model_id: str, sample_ids: list[str]
+        self, model_id: str, sample_ids: List[str]
     ) -> dict[str, list]:
         df_results = self.project.get_model_results(model_id, sample_ids)
 

@@ -299,12 +299,12 @@ results to the samples.[/bold red]",
         # This function returns the number of samples in the project
         return len(self.data)
 
-    def get_samples_ids(self) -> list[str]:
+    def get_samples_ids(self) -> List[str]:
         # This function returns the list of samples ids
         project_data = self.data
         return project_data[self.config.sample_id_column_name].tolist()
 
-    def get_data(self, samples_ids: list[str]) -> pd.DataFrame:
+    def get_data(self, samples_ids: List[str]) -> pd.DataFrame:
         # This function will be called when the user
         # wants to analyze data from your project
 
@@ -341,7 +341,7 @@ results to the samples.[/bold red]",
 
         return models
 
-    def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
+    def get_model_evaluated_data_id_list(self, model_id: str) -> List[str]:
         # This function returns the list of sample IDs for a given model
         if not self.config.results_parquet_folder_path:
             return []
@@ -361,7 +361,7 @@ results to the samples.[/bold red]",
         return model_results[self.config.sample_id_column_name].tolist()
 
     def get_model_results(
-        self, model_id: str, samples_ids: list[str]
+        self, model_id: str, samples_ids: List[str]
     ) -> pd.DataFrame:  # noqa
         # Construct the path to the model's parquet file
         if not self.config.results_parquet_folder_path:

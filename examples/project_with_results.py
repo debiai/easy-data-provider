@@ -1,5 +1,6 @@
 import pandas as pd
 from debiai_data_provider import DebiAIProject, DataProvider
+from typing import List
 
 # This file is an example of a simple project
 # exposed with the DebiAI Data Provider python module.
@@ -81,11 +82,11 @@ class MyProjectWithResults(DebiAIProject):
         # This function returns the number of samples in the project
         return len(PROJECT_DATA)
 
-    def get_samples_ids(self) -> list[str]:
+    def get_samples_ids(self) -> List[str]:
         # This function returns the list of samples ids
         return PROJECT_DATA["Data ID"].tolist()
 
-    def get_data(self, samples_ids: list[str]) -> pd.DataFrame:
+    def get_data(self, samples_ids: List[str]) -> pd.DataFrame:
         # This function will be called when the user
         # wants to analyze data from your project
 
@@ -117,7 +118,7 @@ class MyProjectWithResults(DebiAIProject):
 
         return models_data
 
-    def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
+    def get_model_evaluated_data_id_list(self, model_id: str) -> List[str]:
         # This function will be called when the user
         # wants to analyze the results of a specific model
         # The function should return the list of samples ids
@@ -130,7 +131,7 @@ class MyProjectWithResults(DebiAIProject):
 
         return MODEL_RESULTS[MODEL_RESULTS["model"] == model_id]["sample_id"].tolist()
 
-    def get_model_results(self, model_id: str, samples_ids: list[str]) -> pd.DataFrame:
+    def get_model_results(self, model_id: str, samples_ids: List[str]) -> pd.DataFrame:
         # This function will be called when the user
         # wants to analyze the results of a specific model
         # The function should return a pandas DataFrame
