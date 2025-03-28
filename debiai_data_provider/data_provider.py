@@ -48,6 +48,13 @@ class DataProvider:
         else:
             project_name = extract_project_class_name(project)
 
+        # Check if the project name already exists
+        for existing_project in self.projects:
+            if existing_project.project_name == project_name:
+                raise ValueError(
+                    f"A project with the name '{project_name}' already exists."
+                )
+
         self.projects.append(
             ProjectToExpose(
                 project=project,

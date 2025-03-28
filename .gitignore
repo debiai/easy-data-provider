@@ -6,5 +6,15 @@ dist/
 # Ignore all __pycache__ directories
 __pycache__/    
 
-# Virtual environment
+# Dev & Virtual environment
+.vscode/
 venv/
+
+# Tests
+.coverage
+htmlcov/
+
+# DebiAI
+debiai_data/
+simple_project.py
+easy_parquet_test.py

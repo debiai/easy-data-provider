@@ -18,16 +18,45 @@ Install `debiai_data_provider` with pip:
 pip install debiai_data_provider
 ```
 
-### Usage example
+### Usage
 
-Find out how to use the DebiAI Data Provider Python module in the [examples](examples) folder:
-
-- [simple_project.py](examples/simple_project.py) shows how to create a simple data-provider with a project
-- [project_with_results.py](examples/project_with_results.py) shows how to create a data-provider with a project that also provides model results
+Create a new Python file, for example `my_data_provider.py` and copy the content of the [simple_project.py](examples/simple_project.py) Data-provider.
 
 Run the Python file and your project is now available through the DebiAI Data Provider API!
 
+This way of creating a data-provider is the most generic one, you can customize it to support any data-sources.
+
+We also provide a higher level of abstraction to create data-providers:
+
+- [ParquetDataProvider](debiai_data_provider/parquet_data_provider.py) is a data-provider that provides data from a parquet file. It is a simple way to create a data-provider with a parquet file as input.
+
+#### Plug-in your data-provider with DebiAI
+
 To link your data-provider with DebiAI, you can follow our [Creation of a data provider guide](https://debiai.irt-systemx.fr/dataInsertion/dataProviders/quickStart.html)
+
+### Examples
+
+Find out how to use the DebiAI Data Provider Python module in the [examples](examples) folder:
+
+#### Generic Data-providers
+
+- [simple_project.py](examples/simple_project.py) shows how to create a simple data-provider with a project
+- [project_with_results.py](examples/project_with_results.py) shows how to create a data-provider with a project that also provides model results
+- [parquet_data_provider.py](examples/parquet_data_provider/parquet_data_provider.py) shows how to create a data-provider that provides data from a parquet file
+
+#### Data-providers with a higher level of abstraction
+
+- [easy_parquet_data_provider.py](examples/parquet_data_provider/easy_parquet_data_provider.py) does the same as the previous example but with a higher implementation level, using the `ParquetDataProvider` class.
+
+## Testing
+
+To run the tests, install the dependencies and run the tests with `pytest`:
+
+```bash
+pip install -r requirements.txt
+pip install pytest pytest-cov
+python -m pytest --cov=debiai_data_provider
+```
 
 ## Roadmap
 
