@@ -9,6 +9,7 @@
     "DebiAI",
     "fastapi",
     "groundtruth",
+    "htmlcov",
     "imshow",
     "isin",
     "jsonify",

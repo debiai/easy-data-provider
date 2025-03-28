@@ -30,6 +30,16 @@ Run the Python file and your project is now available through the DebiAI Data Pr
 
 To link your data-provider with DebiAI, you can follow our [Creation of a data provider guide](https://debiai.irt-systemx.fr/dataInsertion/dataProviders/quickStart.html)
 
+## Testing
+
+To run the tests, install the dependencies and run the tests with `pytest`:
+
+```bash
+pip install -r requirements.txt
+pip install pytest pytest-cov
+python -m pytest --cov=debiai_data_provider
+```
+
 ## Roadmap
 
 - [x] Publish to Pypi
