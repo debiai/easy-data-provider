@@ -83,9 +83,6 @@ class ParquetDataProvider(DebiAIProject):
         self.load_model_parquet_results()
 
     def load_project_parquet_samples(self):
-        if self.data is not None:
-            return self.data
-
         parquet_df = pd.read_parquet(self.config.parquet_path)
 
         # Check if the sample_id_column_name is in the columns
@@ -109,18 +106,15 @@ class ParquetDataProvider(DebiAIProject):
                 f"Column '{self.config.sample_id_column_name}' not found in the parquet file."
             )
 
-        # Check if all the sample IDs are type str
-        if (
-            not parquet_df[self.config.sample_id_column_name]
-            .apply(lambda x: isinstance(x, str))
-            .all()
-        ):
-            console = Console()
-            console.print(
-                "[bold red]Error:[/bold red] Due to a current DebiAI limitation, the sample IDs in the parquet file must all be strings.",
-                style="red",
-            )
-            raise ValueError("Sample IDs must be strings.")
+        # Check if all the sample IDs column values are type str
+        for id in parquet_df[self.config.sample_id_column_name]:
+            if not isinstance(id, str):
+                console = Console()
+                console.print(
+                    "[bold red]Error:[/bold red] The sample IDs in the parquet file must be strings.",
+                    style="red",
+                )
+                raise ValueError("Sample IDs must be strings.")
 
         # Check if the sample IDs are unique
         if not parquet_df[self.config.sample_id_column_name].is_unique:
@@ -142,11 +136,10 @@ class ParquetDataProvider(DebiAIProject):
             parquet_df = parquet_df[list(columns_to_keep)]
 
         # Convert np.int64 to native Python int
-        data = parquet_df.map(
-            lambda x: int(x) if isinstance(x, (np.integer)) else str(x)
-        )
+        parquet_df = parquet_df.map(lambda x: int(x) if isinstance(x, np.int64) else x)
 
-        self.data = data
+        # Store the data
+        self.data = parquet_df
 
     def load_model_parquet_results(self):
         if not self.config.results_csv_folder_path:
@@ -175,7 +168,8 @@ class ParquetDataProvider(DebiAIProject):
                     style="red",
                 )
                 console.print(
-                    "[bold red]This column is required to map the model results to the samples.[/bold red]",
+                    "[bold red]This column is required to map the model \
+results to the samples.[/bold red]",
                     style="red",
                 )
                 console.print(
@@ -199,21 +193,21 @@ class ParquetDataProvider(DebiAIProject):
             # Add the sample_id column if not present, with the index as the sample_id
             if not self.config.sample_id_column_name:
                 parquet_df["_sample_ids"] = parquet_df.index
-                columns_to_keep.add("_sample_ids")
 
             # Add a _model_name column
             parquet_df["_model_name"] = model_name
-            columns_to_keep.add("_model_name")
 
             if model_results is None:
                 model_results = parquet_df
             else:
-                model_results = model_results.merge(
-                    parquet_df, on=self.config.sample_id_column_name, how="left"
+                # Stack the results
+                model_results = pd.concat(
+                    [model_results, parquet_df], ignore_index=True
                 )
 
         # Store the model results
         self.model_results = model_results
+        print("model_results:")
         print(self.model_results)
 
     # Project Info
@@ -284,56 +278,42 @@ class ParquetDataProvider(DebiAIProject):
             return []
 
         models = []
-        for parquet_files in os.listdir(RESULTS_PARQUET_FOLDER_PATH):
+        for parquet_files in os.listdir(self.config.results_csv_folder_path):
             if not parquet_files.endswith(".parquet"):
                 continue
 
-            # Open the parquet file
-            results_df = pd.read_parquet(
-                os.path.join(RESULTS_PARQUET_FOLDER_PATH, parquet_files)
-            )
-            print(results_df.head())
-            print(results_df.columns)
-
             model_name = parquet_files.split(".")[0]
+
+            # Count the number of results for the model
+            num_results = self.model_results[
+                self.model_results["_model_name"] == model_name
+            ].shape[0]
+
             models.append(
                 {
                     "id": model_name,
                     "name": model_name,
-                    "nb_results": len(
-                        self.get_model_evaluated_data_id_list(model_name)
-                    ),
+                    "nb_results": num_results,
                 }
             )
+
+        # Sort the models by name
+        models.sort(key=lambda x: x["name"])
 
         return models
 
     def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
-        # Construct the path to the model's parquet file
-
+        # This function returns the list of sample IDs for a given model
         if not self.config.results_csv_folder_path:
             return []
 
-        model_file_path = os.path.join(
-            RESULTS_PARQUET_FOLDER_PATH, f"{model_id}.parquet"
-        )
-
-        # Check if the file exists
-        if not os.path.exists(model_file_path):
-            raise FileNotFoundError(
-                f"Model file for '{model_id}' not found at {model_file_path}"
-            )
-
-        # Open the model's parquet file
-        model_inferences = pd.read_parquet(model_file_path)
+        # Filter the model results
+        model_results = self.model_results[
+            self.model_results["_model_name"] == model_id
+        ]
 
         # Return the list of sample IDs
-        # Only return the sample IDs that are in the data
-        data_sample_ids = self.get_samples_ids()
-        model_sample_ids = model_inferences["sample_id"].tolist()
-        return [
-            sample_id for sample_id in model_sample_ids if sample_id in data_sample_ids
-        ]
+        return model_results[self.config.sample_id_column_name].tolist()
 
     def get_model_results(
         self, model_id: str, samples_ids: list[str]
@@ -342,23 +322,13 @@ class ParquetDataProvider(DebiAIProject):
         if not self.config.results_csv_folder_path:
             return []
 
-        model_file_path = os.path.join(
-            RESULTS_PARQUET_FOLDER_PATH, f"{model_id}.parquet"
-        )
-
-        # Check if the file exists
-        if not os.path.exists(model_file_path):
-            raise FileNotFoundError(
-                f"Model file for '{model_id}' not found at {model_file_path}"
-            )
-
-        # Open the model's parquet file
-        model_inferences = pd.read_parquet(model_file_path)
-
-        # Filter the results for the given sample IDs
-        model_inferences = model_inferences[
-            model_inferences["sample_id"].isin(samples_ids)
+        # Filter the model results
+        model_results = self.model_results[
+            self.model_results["_model_name"] == model_id
         ]
 
+        # Filter the results for the given sample IDs
+        model_results = model_results[model_results["sample_id"].isin(samples_ids)]
+
         # Return the filtered DataFrame
-        return model_inferences
+        return model_results
