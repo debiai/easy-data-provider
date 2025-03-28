@@ -7,7 +7,7 @@ from debiai_data_provider.models.debiai import (
     Column,
     ExpectedResult,
 )
-from typing import Optional, Union, List, Tuple
+from typing import Optional, Union, List, Tuple, Dict
 
 
 class DebiAIProject:
@@ -357,7 +357,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
     def get_model_results(
         self, model_id: str, sample_ids: List[str]
-    ) -> dict[str, list]:
+    ) -> Dict[str, list]:
         df_results = self.project.get_model_results(model_id, sample_ids)
 
         # Convert the dataframe to a list of dictionaries
