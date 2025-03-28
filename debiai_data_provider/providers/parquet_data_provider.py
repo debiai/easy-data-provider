@@ -190,10 +190,6 @@ results to the samples.[/bold red]",
 
                 parquet_df = parquet_df[list(columns_to_keep)]
 
-            # Add the sample_id column if not present, with the index as the sample_id
-            if not self.config.sample_id_column_name:
-                parquet_df["_sample_ids"] = parquet_df.index
-
             # Add a _model_name column
             parquet_df["_model_name"] = model_name
 

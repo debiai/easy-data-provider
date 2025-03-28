@@ -72,6 +72,39 @@ def test_bad_configurations():
             )
 
     # results with non-existing sample_id
+    data = pd.DataFrame(
+        {
+            "sample_id": ["S1", "S2", "S3"],
+            "class": ["A", "B", "C"],
+            "value": [10, 20, 30],
+        }
+    )
+    results = {
+        "m1": pd.DataFrame(
+            {
+                "predicted_state": ["OK", "KO"],
+                "score": [0.9, 0.8],
+            }
+        ),
+        "m2": pd.DataFrame(
+            {
+                "predicted_state": ["KO", "OK"],
+                "score": [0.7, 0.6],
+            }
+        ),
+    }
+    with create_temp_parquet_file(data) as parquet_path, create_temp_results_folder(
+        results
+    ) as results_dir:
+        with pytest.raises(
+            ValueError,
+            match="Column 'sample_id' not found",
+        ):
+            ParquetDataProvider(
+                parquet_path=parquet_path,
+                sample_id_column_name="sample_id",
+                results_csv_folder_path=results_dir,
+            )
 
 
 def test_parquet_data_provider_basic():
@@ -166,6 +199,18 @@ def test_parquet_data_provider_with_results():
         assert m2_results["sample_id"].tolist() == ["S2", "S3"]
         assert m2_results["predicted_state"].tolist() == ["KO", "OK"]
         assert m2_results["score"].tolist() == [0.7, 0.6]
+
+        # New provider with columns filter
+        provider = ParquetDataProvider(
+            parquet_path=parquet_path,
+            sample_id_column_name="sample_id",
+            results_csv_folder_path=results_dir,
+            results_columns=["predicted_state"],
+        )
+        m1_results = provider.get_model_results("m1", ["S1", "S2"])
+        assert m1_results["sample_id"].tolist() == ["S1", "S2"]
+        assert "predicted_state" in m1_results.columns
+        assert "score" not in m1_results.columns
 
 
 def test_parquet_data_provider_with_columns():
