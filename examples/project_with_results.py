@@ -96,7 +96,7 @@ class MyProjectWithResults(DebiAIProject):
         return PROJECT_DATA[PROJECT_DATA["Data ID"].isin(samples_ids)]
 
     # Project model results
-    def get_models(self) -> list[dict]:
+    def get_models(self) -> List[dict]:
         # This function will be called when DebiAI
         # ask the user to select a model to analyze the results
         # The function should return the list of models

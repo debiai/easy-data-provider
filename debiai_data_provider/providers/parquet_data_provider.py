@@ -315,7 +315,7 @@ results to the samples.[/bold red]",
         return data
 
     # Project models
-    def get_models(self) -> list[dict]:
+    def get_models(self) -> List[dict]:
         # List the models available in the project
         if self.model_results is None:
             return []

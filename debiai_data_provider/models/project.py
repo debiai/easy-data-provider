@@ -37,7 +37,7 @@ class DebiAIProject:
         raise NotImplementedError
 
     # Project models
-    def get_models(self) -> list[ModelDetail]:
+    def get_models(self) -> List[ModelDetail]:
         return []
 
     def get_model_evaluated_data_id_list(self, model_id: str) -> List[str]:
@@ -53,7 +53,7 @@ class ProjectToExpose:
         self.project_name = project_name
 
     # Getters
-    def get_columns(self) -> Union[list[Column], None]:
+    def get_columns(self) -> Union[List[Column], None]:
         try:
             structure = self.project.get_structure()
         except NotImplementedError:
@@ -136,7 +136,7 @@ class ProjectToExpose:
 
         return columns
 
-    def get_results_columns(self) -> Union[list[ExpectedResult], None]:
+    def get_results_columns(self) -> Union[List[ExpectedResult], None]:
         try:
             structure = self.project.get_results_structure()
         except NotImplementedError:
@@ -327,7 +327,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         )
 
     # Models
-    def get_models(self) -> list[ModelDetail]:
+    def get_models(self) -> List[ModelDetail]:
         models = self.project.get_models()
 
         # Convert the models to ModelDetail
