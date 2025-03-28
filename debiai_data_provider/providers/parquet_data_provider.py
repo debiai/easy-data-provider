@@ -21,11 +21,17 @@ class ParquetDataProviderConfig(BaseModel):
     columns: Optional[List[str]] = Field(
         None, description="Columns to include in the project"
     )
-    results_csv_folder_path: Optional[str] = Field(  # Renamed field
+    results_parquet_folder_path: Optional[str] = Field(  # Renamed field
         None, description="Path to the folder containing model results"
     )
     results_columns: Optional[List[str]] = Field(
         None, description="Columns for model results"
+    )
+    ignored_columns: Optional[List[str]] = Field(
+        None, description="Columns to ignore in the project"
+    )
+    ignored_results_columns: Optional[List[str]] = Field(
+        None, description="Columns to ignore in model results"
     )
 
 
@@ -33,6 +39,7 @@ class ParquetDataProvider(DebiAIProject):
     creation_date = "2025-03-28"
     # update_date = "2025-03-28"
     data: pd.DataFrame = None
+    model_results: pd.DataFrame = None
 
     def __init__(
         self,
@@ -40,8 +47,10 @@ class ParquetDataProvider(DebiAIProject):
         sample_id_column_name: str,
         name: Optional[str] = None,
         columns: Optional[List[str]] = None,
-        results_csv_folder_path: Optional[str] = None,
+        results_parquet_folder_path: Optional[str] = None,
         results_columns: Optional[List[str]] = None,
+        ignored_columns: Optional[List[str]] = None,
+        ignored_results_columns: Optional[List[str]] = None,
     ):
         super().__init__()
         self.config = ParquetDataProviderConfig(
@@ -49,8 +58,10 @@ class ParquetDataProvider(DebiAIProject):
             name=name,
             columns=columns,
             sample_id_column_name=sample_id_column_name,
-            results_csv_folder_path=results_csv_folder_path,
+            results_parquet_folder_path=results_parquet_folder_path,
             results_columns=results_columns,
+            ignored_columns=ignored_columns,
+            ignored_results_columns=ignored_results_columns,
         )
 
         # Setup name
@@ -135,6 +146,39 @@ class ParquetDataProvider(DebiAIProject):
 
             parquet_df = parquet_df[list(columns_to_keep)]
 
+        # Filter out ignored columns
+        if self.config.ignored_columns:
+            parquet_df = parquet_df.drop(
+                columns=self.config.ignored_columns, errors="ignore"
+            )
+
+        # Validate data types and log faulty columns
+        valid_types = (str, int, float, bool, list, dict)
+        for column in parquet_df.columns:
+            invalid_rows = parquet_df[column].apply(
+                lambda x: not isinstance(x, valid_types)
+            )
+            if invalid_rows.any():
+                # get whats the type of the first invalid value
+                invalid_value_type = type(parquet_df[invalid_rows][column].iloc[0])
+
+                console = Console()
+                table = Table(
+                    title=f"Invalid Data in Column '{column}'\nThis column might \
+cause issues in DebiAI, you can use the `ignored_columns` parameter to ignore this column.",
+                    show_header=True,
+                    header_style="bold red",
+                )
+                table.add_column("Row Index", no_wrap=True)
+                table.add_column("Value", style="red")
+                table.add_row("Invalid Value Type", str(invalid_value_type))
+                table.add_row("Invalid Rows Count", str(invalid_rows.sum()))
+
+                for idx, value in parquet_df[invalid_rows][column].head(5).items():
+                    table.add_row(str(idx), str(value))
+
+                console.print(table)
+
         # Convert np.int64 to native Python int
         parquet_df = parquet_df.map(lambda x: int(x) if isinstance(x, np.int64) else x)
 
@@ -142,18 +186,18 @@ class ParquetDataProvider(DebiAIProject):
         self.data = parquet_df
 
     def load_model_parquet_results(self):
-        if not self.config.results_csv_folder_path:
+        if not self.config.results_parquet_folder_path:
             return
 
         model_results = None
 
-        for results_file in os.listdir(self.config.results_csv_folder_path):
+        for results_file in os.listdir(self.config.results_parquet_folder_path):
             if not results_file.endswith(".parquet"):
                 continue
 
             model_name = results_file.split(".")[0]
             parquet_df = pd.read_parquet(
-                os.path.join(self.config.results_csv_folder_path, results_file)
+                os.path.join(self.config.results_parquet_folder_path, results_file)
             )
 
             # Check if the sample_id_column_name is in the columns
@@ -190,6 +234,12 @@ results to the samples.[/bold red]",
 
                 parquet_df = parquet_df[list(columns_to_keep)]
 
+            # Filter out ignored columns
+            if self.config.ignored_results_columns:
+                parquet_df = parquet_df.drop(
+                    columns=self.config.ignored_results_columns, errors="ignore"
+                )
+
             # Add a _model_name column
             parquet_df["_model_name"] = model_name
 
@@ -203,8 +253,6 @@ results to the samples.[/bold red]",
 
         # Store the model results
         self.model_results = model_results
-        print("model_results:")
-        print(self.model_results)
 
     # Project Info
     def get_structure(self) -> dict:
@@ -227,7 +275,7 @@ results to the samples.[/bold red]",
 
     def get_results_structure(self) -> dict:
         # Load the data from the parquet file
-        if not self.config.results_csv_folder_path:
+        if not self.config.results_parquet_folder_path:
             raise NotImplementedError(
                 "Results structure is not available for this project."
             )
@@ -237,12 +285,12 @@ results to the samples.[/bold red]",
         # Create the structure
         results_structure = {}
 
-        for model_name, model_results in self.model_results.items():
-            for col in model_results.columns:
-                if col in UNWANTED_COLUMNS:
-                    continue
+        # Iterate over the columns of the model_results DataFrame
+        for col in self.model_results.columns:
+            if col in UNWANTED_COLUMNS or col == "_model_name":
+                continue
 
-                results_structure[col] = {"type": "auto"}
+            results_structure[col] = {"type": "auto"}
 
         return results_structure
 
@@ -264,26 +312,21 @@ results to the samples.[/bold red]",
         # containing the data corresponding to the samples_ids
         project_data = self.data.set_index(self.config.sample_id_column_name)
         data = project_data.loc[samples_ids]
-
         return data
 
     # Project models
     def get_models(self) -> list[dict]:
         # List the models available in the project
-        if not self.config.results_csv_folder_path:
+        if self.model_results is None:
             return []
 
         models = []
-        for parquet_files in os.listdir(self.config.results_csv_folder_path):
-            if not parquet_files.endswith(".parquet"):
-                continue
+        # Get the list of models from model_results dataframe
+        unique_model_names = self.model_results["_model_name"].unique()
 
-            model_name = parquet_files.split(".")[0]
-
+        for model_name in unique_model_names:
             # Count the number of results for the model
-            num_results = self.model_results[
-                self.model_results["_model_name"] == model_name
-            ].shape[0]
+            num_results = len(self.get_model_evaluated_data_id_list(model_name))
 
             models.append(
                 {
@@ -300,12 +343,18 @@ results to the samples.[/bold red]",
 
     def get_model_evaluated_data_id_list(self, model_id: str) -> list[str]:
         # This function returns the list of sample IDs for a given model
-        if not self.config.results_csv_folder_path:
+        if not self.config.results_parquet_folder_path:
             return []
 
         # Filter the model results
         model_results = self.model_results[
             self.model_results["_model_name"] == model_id
+        ]
+
+        # Only keep the samples_id that are in the project data
+        project_samples_id = self.get_samples_ids()
+        model_results = model_results[
+            model_results[self.config.sample_id_column_name].isin(project_samples_id)
         ]
 
         # Return the list of sample IDs
@@ -315,7 +364,7 @@ results to the samples.[/bold red]",
         self, model_id: str, samples_ids: list[str]
     ) -> pd.DataFrame:  # noqa
         # Construct the path to the model's parquet file
-        if not self.config.results_csv_folder_path:
+        if not self.config.results_parquet_folder_path:
             return []
 
         # Filter the model results
