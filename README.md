@@ -24,6 +24,7 @@ Find out how to use the DebiAI Data Provider Python module in the [examples](exa
 
 - [simple_project.py](examples/simple_project.py) shows how to create a simple data-provider with a project
 - [project_with_results.py](examples/project_with_results.py) shows how to create a data-provider with a project that also provides model results
+- [parquet_data_provider.py](examples/parquet_dataprovider/parquet_data_provider.py) shows how to create a data-provider that provides data from a parquet file
 
 Run the Python file and your project is now available through the DebiAI Data Provider API!
 
