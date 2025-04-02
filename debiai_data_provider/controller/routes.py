@@ -11,6 +11,7 @@ from debiai_data_provider.models.debiai import (
 )
 from debiai_data_provider.version import VERSION
 from debiai_data_provider.data_provider import DataProvider
+from debiai_data_provider.services.homepage_service import get_homepage_html
 
 router = APIRouter()
 
@@ -171,3 +172,9 @@ def delete_selection(
     selectionId: str = Path(..., min_length=1, example="Selection 1"),
 ):
     return {"message": "Selection deleted"}
+
+
+# Homepage route
+@router.get("/", tags=["Homepage"])
+def get_homepage(data_provider: DataProvider = Depends(get_data_provider)):
+    return get_homepage_html(data_provider)
