@@ -58,6 +58,13 @@ pip install pytest pytest-cov
 python -m pytest --cov=debiai_data_provider
 ```
 
+Tested versions:
+
+- Python 3.9
+- Python 3.10
+- Python 3.11
+- Python 3.12
+
 ## Roadmap
 
 - [x] Publish to Pypi
