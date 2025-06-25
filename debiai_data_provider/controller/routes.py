@@ -21,12 +21,12 @@ def get_data_provider(request: Request):
 
 # Info routes
 @router.get("/info", response_model=InfoResponse, tags=["Info"])
-def get_info():
+def get_info(data_provider: DataProvider = Depends(get_data_provider)):
     return InfoResponse(
         version=VERSION,
-        maxSampleIdByRequest=10000,
-        maxSampleDataByRequest=2000,
-        maxResultByRequest=5000,
+        maxSampleIdByRequest=data_provider.max_sample_id_by_request or 10000,
+        maxSampleDataByRequest=data_provider.max_sample_data_by_request or 2000,
+        maxResultByRequest=data_provider.max_result_by_request or 5000,
         canDelete=CanDelete(),
     )
 

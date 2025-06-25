@@ -307,7 +307,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         return samples_ids
 
     def get_data_from_ids(self, samples_ids: List[str]) -> dict:
-        from debiai_data_provider.utils.parser import dataframe_to_debiai_data_array
+        from debiai_data_provider.utils.parser import dataframe_to_debiai_data
 
         # Get the data from the project
         df_data = self.project.get_data(samples_ids)
@@ -317,13 +317,16 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
         # Verify that all the columns are in the dataframe
         columns = self.get_columns()
+        if not columns:
+            raise ValueError("The project has no columns defined.")
+
         for column in columns:
             if column.name not in df_data.columns:
                 # Add the column to the dataframe
                 df_data[column.name] = None
 
-        return dataframe_to_debiai_data_array(
-            columns=self.get_columns(), samples_id=samples_ids, data=df_data
+        return dataframe_to_debiai_data(
+            columns=columns, samples_id=samples_ids, data=df_data
         )
 
     # Models

@@ -7,19 +7,48 @@ from rich.panel import Panel
 
 
 class DataProvider:
-    def __init__(self):
+    def __init__(
+        self,
+        max_sample_id_by_request=10000,
+        max_sample_data_by_request=2000,
+        max_result_by_request=5000,
+    ):
+        """
+        Initializes the DataProvider with optional parameters for maximum limits.
+
+        Parameters:
+            max_sample_id_by_request (int): Maximum number of sample IDs in a single request.
+            max_sample_data_by_request (int): Maximum number of sample data in a single request.
+            max_result_by_request (int): Maximum number of results in a single request.
+        """
         self.projects: List[ProjectToExpose] = []
+        self.max_sample_id_by_request = max_sample_id_by_request
+        self.max_sample_data_by_request = max_sample_data_by_request
+        self.max_result_by_request = max_result_by_request
 
     def start_server(self, host="0.0.0.0", port=8000):
         from debiai_data_provider.app import start_api_server
 
         # Print the server information
         console = Console()
+        panel_text = (
+            "The Data Provider is being started..."
+            + f"\n\n[bold]API Server[/bold]: http://{host}:{port}"
+            + f"\n[bold]Number of Projects[/bold]: {len(self.get_projects())}"
+        )
+
+        # Display parameters
+        panel_text += "\n[bold]Parameters[/bold]:\n  " + "\n  ".join(
+            [
+                f"Max sample id by request: {self.max_sample_id_by_request}",
+                f"Max sample data by request: {self.max_sample_data_by_request}",
+                f"Max result by request: {self.max_result_by_request}",
+            ]
+        )
+
         console.print(
             Panel(
-                "The Data Provider is being started..."
-                + f"\n\n[bold]API Server[/bold]: http://{host}:{port}"
-                + f"\n[bold]Number of Projects[/bold]: {len(self.get_projects())}",
+                panel_text,
                 title=f"DebiAI Data Provider v{VERSION}",
                 width=80,
                 border_style="bold",
