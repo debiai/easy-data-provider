@@ -280,7 +280,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
             name=self.project_name,
             dataProviderId="json_block",
             columns=columns,
-            expectedResults=results_columns,
+            expectedResults=results_columns if results_columns else [],
             models=[],
             selections=[],
             metrics={"nbModels": 0, "nbSamples": nbSamples, "nbSelections": 0},
@@ -428,9 +428,10 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         if columns:
             table.add_row("Structure:", "")
             for column in columns:
+                category = column.metadata["category"] if "category" in column.metadata else "auto"
                 column_value = (
                     f"[bold blue]{column.type}[/bold blue] "
-                    + f"[italic]{column.category}[/italic]"
+                    + f"[italic]{category}[/italic]"
                 )
                 if "group" in column.metadata:
                     group = column.metadata["group"]
@@ -454,8 +455,9 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
             table.add_row("Results:", "")
             for column in results_columns:
                 column_value = f"[bold blue]{column.type}[/bold blue] "
-                if column.group:
-                    column_value += f" [blue]<{column.group}>[/blue]"
+                if "group" in column.metadata:
+                    group = column.metadata["group"]
+                    column_value += f" [blue]<{group}>[/blue]"
 
                 table.add_row(
                     f"[bold green]{column.name}[/bold green]",

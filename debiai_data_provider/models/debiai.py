@@ -27,7 +27,6 @@ class ProjectOverview(BaseModel):
 
 class Column(BaseModel):
     name: str
-    category: str = "other"
     metadata: Optional[dict] = {}
     metrics: Optional[dict] = {}
     tags: Optional[list] = []
