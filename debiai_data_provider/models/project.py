@@ -52,6 +52,7 @@ class ProjectToExpose:
         self.project = project
         self.project_name = project_name
 
+    # Getters
     def get_columns(self) -> Union[List[Column], None]:
         try:
             structure = self.project.get_structure()
