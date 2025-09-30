@@ -89,10 +89,7 @@ def get_data(
 ):
     print(sampleIds)
     project = data_provider._get_project_to_expose(projectId)
-    response = {
-        "data": project.get_data_from_ids(sampleIds),
-        "dataMap": True
-    }
+    response = {"data": project.get_data_from_ids(sampleIds), "dataMap": True}
     return response
 
 

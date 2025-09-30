@@ -48,11 +48,12 @@ class ProjectDetails(BaseModel):
     nbSamples: Optional[int] = None
     creationDate: Optional[int] = None
     updateDate: Optional[int] = None
-    models: Optional[list] = [],
-    selections: Optional[list] = [],
+    models: Optional[list] = ([],),
+    selections: Optional[list] = ([],),
+
     metrics: Optional[dict] = {}
     tags: Optional[list] = [],
-    metadata: Optional[dict] = {},
+    metadata: Optional[dict] = ({},)
 
 
 class ModelDetail(BaseModel):

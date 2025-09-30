@@ -128,7 +128,10 @@ class ProjectToExpose:
             columns.append(
                 Column(
                     name=key,
-                    metadata={"category": value["category"], "group": value.get("group", "")},
+                    metadata={
+                        "category": value["category"],
+                        "group": value.get("group", ""),
+                    },
                     metrics={},
                     tags=[],
                     type=value["type"],
@@ -285,7 +288,11 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
             expectedResults=results_columns if results_columns else [],
             models=models,
             selections=[],
-            metrics={"nbModels": len(models), "nbSamples": nbSamples, "nbSelections": 0},
+            metrics={
+                "nbModels": len(models),
+                "nbSamples": nbSamples,
+                "nbSelections": 0,
+            },
             tags=[],
             metadata={},
             creationDate=creationDate,
@@ -430,7 +437,12 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         if columns:
             table.add_row("Structure:", "")
             for column in columns:
-                category = column.metadata["category"] if "category" in column.metadata else "auto"
+
+                category = (
+                    column.metadata["category"]
+                    if "category" in column.metadata
+                    else "auto"
+                )
                 column_value = (
                     f"[bold blue]{column.type}[/bold blue] "
                     + f"[italic]{category}[/italic]"
