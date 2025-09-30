@@ -56,8 +56,8 @@ def delete_project(
 
 
 # Data routes
-@router.get(
-    "/projects/{projectId}/data-id-list",
+@router.post(
+    "/projects/{projectId}/dataIdList",
     response_model=List[Union[str, int]],
     tags=["Data"],
 )
@@ -75,19 +75,25 @@ def get_data_id_list(
 
 
 @router.post(
-    "/projects/{projectId}/data",
-    response_model=Dict[
+    "/projects/{projectId}/blocksFromSampleIds",
+    response_model=Dict[str, Union[bool, Dict[
         Union[str, int], List[Union[str, int, float, bool, None, list, dict]]
+        ]]
     ],
     tags=["Data"],
 )
 def get_data(
     projectId: str = Path(..., min_length=1, example="Project 1"),
-    samples_ids: List[Union[str, int, float]] = Body(...),
+    sampleIds: List[Union[str, int, float]] = Body(..., embed=True),
     data_provider: DataProvider = Depends(get_data_provider),
 ):
+    print(sampleIds)
     project = data_provider._get_project_to_expose(projectId)
-    return project.get_data_from_ids(samples_ids)
+    response = {
+        "data": project.get_data_from_ids(sampleIds),
+        "dataMap": True
+    }
+    return response
 
 
 # Model routes

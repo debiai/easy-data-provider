@@ -52,7 +52,6 @@ class ProjectToExpose:
         self.project = project
         self.project_name = project_name
 
-    # Getters
     def get_columns(self) -> Union[List[Column], None]:
         try:
             structure = self.project.get_structure()
@@ -128,12 +127,12 @@ class ProjectToExpose:
             columns.append(
                 Column(
                     name=key,
-                    category=value["category"],
+                    metadata={"category": value["category"], "group": value.get("group", "")},
+                    metrics={},
+                    tags=[],
                     type=value["type"],
-                    group=value.get("group", ""),
                 )
             )
-
         return columns
 
     def get_results_columns(self) -> Union[List[ExpectedResult], None]:
@@ -276,10 +275,16 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         results_columns = self.get_results_columns()
 
         return ProjectDetails(
+            id=self.project_name,
             name=self.project_name,
+            dataProviderId="json_block",
             columns=columns,
             expectedResults=results_columns,
-            nbSamples=nbSamples,
+            models=[],
+            selections=[],
+            metrics={"nbModels": 0, "nbSamples": nbSamples, "nbSelections": 0},
+            tags=[],
+            metadata={},
             creationDate=creationDate,
             updateDate=updateDate,
         )
@@ -307,7 +312,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         return samples_ids
 
     def get_data_from_ids(self, samples_ids: List[str]) -> dict:
-        from debiai_data_provider.utils.parser import dataframe_to_debiai_data
+        from debiai_data_provider.utils.parser import dataframe_to_debiai_data_array
 
         # Get the data from the project
         df_data = self.project.get_data(samples_ids)
@@ -325,7 +330,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
                 # Add the column to the dataframe
                 df_data[column.name] = None
 
-        return dataframe_to_debiai_data(
+        return dataframe_to_debiai_data_array(
             columns=columns, samples_id=samples_ids, data=df_data
         )
 
@@ -426,8 +431,9 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
                     f"[bold blue]{column.type}[/bold blue] "
                     + f"[italic]{column.category}[/italic]"
                 )
-                if column.group:
-                    column_value += f" [blue]<{column.group}>[/blue]"
+                if "group" in column.metadata:
+                    group = column.metadata["group"]
+                    column_value += f" [blue]<{group}>[/blue]"
 
                 table.add_row(
                     f"[bold green]{column.name}[/bold green]",
