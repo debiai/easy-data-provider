@@ -20,7 +20,8 @@
     "systemx",
     "tolist",
     "uvicorn",
-    "venv"
+    "venv",
+    "Pclass"
   ],
   "flagWords": [],
   "ignorePaths": [

@@ -81,7 +81,7 @@ def get_data_id_list(
         Union[
             bool,
             Dict[Union[str, int], List[Union[str, int, float, bool, None, list, dict]]],
-        ],    
+        ],
     ],
     tags=["Data"],
 )
