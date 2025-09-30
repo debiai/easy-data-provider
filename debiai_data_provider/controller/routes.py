@@ -76,9 +76,12 @@ def get_data_id_list(
 
 @router.post(
     "/projects/{projectId}/blocksFromSampleIds",
-    response_model=Dict[str, Union[bool, Dict[
-        Union[str, int], List[Union[str, int, float, bool, None, list, dict]]
-        ]]
+    response_model=Dict[
+        str,
+        Union[
+            bool,
+            Dict[Union[str, int], List[Union[str, int, float, bool, None, list, dict]]],
+        ],    
     ],
     tags=["Data"],
 )
