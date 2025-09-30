@@ -275,15 +275,17 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
         columns = self.get_columns()
         results_columns = self.get_results_columns()
 
+        models = self.get_models()
+
         return ProjectDetails(
             id=self.project_name,
             name=self.project_name,
             dataProviderId="json_block",
             columns=columns,
             expectedResults=results_columns if results_columns else [],
-            models=[],
+            models=models,
             selections=[],
-            metrics={"nbModels": 0, "nbSamples": nbSamples, "nbSelections": 0},
+            metrics={"nbModels": len(models), "nbSamples": nbSamples, "nbSelections": 0},
             tags=[],
             metadata={},
             creationDate=creationDate,
@@ -455,9 +457,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
             table.add_row("Results:", "")
             for column in results_columns:
                 column_value = f"[bold blue]{column.type}[/bold blue] "
-                if "group" in column.metadata:
-                    group = column.metadata["group"]
-                    column_value += f" [blue]<{group}>[/blue]"
+                column_value += f" [blue]<{column.group}>[/blue]"
 
                 table.add_row(
                     f"[bold green]{column.name}[/bold green]",

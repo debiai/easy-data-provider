@@ -109,6 +109,18 @@ def get_models(
     project = data_provider._get_project_to_expose(projectId)
     return project.get_models()
 
+@router.get(
+    "/projects/{projectId}/models/{modelId}",
+    response_model=List[Union[str, int]],
+    tags=["Models"],
+)
+def get_models_evaluated_data_id_list(
+    projectId: str = Path(..., min_length=1, example="Project 1"),
+    modelId: str = Path(..., min_length=1, example="Model 1"),
+    data_provider: DataProvider = Depends(get_data_provider),
+):
+    project = data_provider._get_project_to_expose(projectId)
+    return project.get_model_evaluated_data_id_list(modelId)
 
 @router.get(
     "/projects/{projectId}/models/{modelId}/evaluated-data-id-list",
