@@ -27,9 +27,10 @@ class ProjectOverview(BaseModel):
 
 class Column(BaseModel):
     name: str
-    category: str = "other"
+    metadata: Optional[dict] = {}
+    metrics: Optional[dict] = {}
+    tags: Optional[list] = []
     type: Optional[str] = "auto"
-    group: Optional[str] = None
 
 
 class ExpectedResult(BaseModel):
@@ -39,12 +40,19 @@ class ExpectedResult(BaseModel):
 
 
 class ProjectDetails(BaseModel):
+    id: Optional[str]
+    dataProviderId: Optional[str]
     name: Optional[str]
     columns: List[Column]
     expectedResults: List[ExpectedResult]
     nbSamples: Optional[int] = None
     creationDate: Optional[int] = None
     updateDate: Optional[int] = None
+    models: Optional[list] = []
+    selections: Optional[list] = []
+    metrics: Optional[dict] = {}
+    tags: Optional[list] = []
+    metadata: Optional[dict] = {}
 
 
 class ModelDetail(BaseModel):
