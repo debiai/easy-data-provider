@@ -61,16 +61,33 @@ def delete_project(
     response_model=List[Union[str, int]],
     tags=["Data"],
 )
-def get_data_id_list(
+async def get_data_id_list(
     projectId: str = Path(..., min_length=1, example="Project 1"),
     from_: Optional[int] = Query(None, alias="from"),
     to: Optional[int] = Query(None),
     analysisId: Optional[str] = Query(None),
     analysisStart: Optional[bool] = Query(None),
     analysisEnd: Optional[bool] = Query(None),
+    request: Request = None,
     data_provider: DataProvider = Depends(get_data_provider),
 ):
     project = data_provider._get_project_to_expose(projectId)
+
+    # Get request body
+    try:
+        body_json = await request.json()
+        if body_json:
+            return project.get_data_id_list(
+                body_json.get("from"),
+                body_json.get("to"),
+                body_json.get("analysis", {}).get("id"),
+                body_json.get("analysis", {}).get("start"),
+                body_json.get("analysis", {}).get("end"),
+            )
+    except Exception:
+        # No JSON
+        pass
+
     return project.get_data_id_list(from_, to, analysisId, analysisStart, analysisEnd)
 
 
@@ -90,7 +107,6 @@ def get_data(
     sampleIds: List[Union[str, int, float]] = Body(..., embed=True),
     data_provider: DataProvider = Depends(get_data_provider),
 ):
-    print(sampleIds)
     project = data_provider._get_project_to_expose(projectId)
     response = {"data": project.get_data_from_ids(sampleIds), "dataMap": True}
     return response

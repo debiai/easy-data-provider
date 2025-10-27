@@ -440,14 +440,19 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
                 category = (
                     column.metadata["category"]
-                    if "category" in column.metadata
+                    if isinstance(column.metadata, dict)
+                    and "category" in column.metadata
                     else "auto"
                 )
                 column_value = (
                     f"[bold blue]{column.type}[/bold blue] "
                     + f"[italic]{category}[/italic]"
                 )
-                if "group" in column.metadata:
+                if (
+                    isinstance(column.metadata, dict)
+                    and "group" in column.metadata
+                    and column.metadata["group"]
+                ):
                     group = column.metadata["group"]
                     column_value += f" [blue]<{group}>[/blue]"
 
