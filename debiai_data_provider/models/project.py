@@ -64,6 +64,7 @@ class ProjectToExpose:
 
         structure = structure.copy()
 
+        # Validate structure
         for key, value in structure.items():
             if not isinstance(value, dict):
                 raise ValueError(
@@ -115,6 +116,7 @@ class ProjectToExpose:
         #         "type": "text",
         #         "category": "context",
         #         "group": "context",
+        #         "metrics": {},
         #     },
         #     ...
         # }
@@ -132,7 +134,7 @@ class ProjectToExpose:
                         "category": value["category"],
                         "group": value.get("group", ""),
                     },
-                    metrics={},
+                    metrics=value.get("metrics", {}),
                     tags=[],
                     type=value["type"],
                 )
