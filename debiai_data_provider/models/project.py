@@ -33,7 +33,7 @@ class DebiAIProject:
     def get_samples_ids(self) -> List[str]:
         raise NotImplementedError
 
-    def get_data(self, samples_ids: List[str]) -> pd.DataFrame:
+    def get_data(self, samples_ids: List[Union[str, int, float]]) -> pd.DataFrame:
         raise NotImplementedError
 
     # Project models
@@ -43,7 +43,9 @@ class DebiAIProject:
     def get_model_evaluated_data_id_list(self, model_id: str) -> List[str]:
         raise NotImplementedError
 
-    def get_model_results(self, model_id: str, sample_ids: List[str]) -> pd.DataFrame:
+    def get_model_results(
+        self, model_id: str, sample_ids: List[Union[str, int, float]]
+    ) -> pd.DataFrame:
         raise NotImplementedError
 
 
@@ -64,6 +66,7 @@ class ProjectToExpose:
 
         structure = structure.copy()
 
+        # Validate structure
         for key, value in structure.items():
             if not isinstance(value, dict):
                 raise ValueError(
@@ -115,6 +118,7 @@ class ProjectToExpose:
         #         "type": "text",
         #         "category": "context",
         #         "group": "context",
+        #         "metrics": {},
         #     },
         #     ...
         # }
@@ -132,7 +136,7 @@ class ProjectToExpose:
                         "category": value["category"],
                         "group": value.get("group", ""),
                     },
-                    metrics={},
+                    metrics=value.get("metrics", {}),
                     tags=[],
                     type=value["type"],
                 )
@@ -321,7 +325,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
 
         return samples_ids
 
-    def get_data_from_ids(self, samples_ids: List[str]) -> dict:
+    def get_data_from_ids(self, samples_ids: List[Union[str, int, float]]) -> dict:
         from debiai_data_provider.utils.parser import dataframe_to_debiai_data_array
 
         # Get the data from the project

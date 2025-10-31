@@ -104,6 +104,9 @@ async def get_data_id_list(
 )
 def get_data(
     projectId: str = Path(..., min_length=1, example="Project 1"),
+    analysisId: Optional[str] = Query(None),
+    analysisStart: Optional[bool] = Query(None),
+    analysisEnd: Optional[bool] = Query(None),
     sampleIds: List[Union[str, int, float]] = Body(..., embed=True),
     data_provider: DataProvider = Depends(get_data_provider),
 ):
