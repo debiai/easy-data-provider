@@ -27,6 +27,8 @@ class ProjectOverview(BaseModel):
 
 class Column(BaseModel):
     name: str
+    category: Optional[str] = "other"
+    group: Optional[str] = None
     metadata: Optional[dict] = {}
     metrics: Optional[dict] = {}
     tags: Optional[list] = []
@@ -44,7 +46,7 @@ class ProjectDetails(BaseModel):
     dataProviderId: Optional[str]
     name: Optional[str]
     columns: List[Column]
-    expectedResults: List[ExpectedResult]
+    resultStructure: List[ExpectedResult] = []
     nbSamples: Optional[int] = None
     creationDate: Optional[int] = None
     updateDate: Optional[int] = None

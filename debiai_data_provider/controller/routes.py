@@ -158,18 +158,21 @@ def get_models_evaluated_data_id_list(
 
 
 @router.post(
-    "/projects/{projectId}/models/{modelId}/results",
+    "/projects/{projectId}/models/{modelId}/getModelResults",
     response_model=Dict[Union[str, int], List[Union[str, int, float, bool]]],
     tags=["Models"],
 )
-def get_model_results(
+async def get_model_results(
     projectId: str = Path(..., min_length=1, example="Project 1"),
     modelId: str = Path(..., min_length=1, example="Model 1"),
-    body: List[Union[str, int, float]] = Body(...),
+    request: Request = None,
     data_provider: DataProvider = Depends(get_data_provider),
 ):
+    """Accepting { sampleIds: [...] } body format used by DebiAI frontend."""
     project = data_provider._get_project_to_expose(projectId)
-    return project.get_model_results(modelId, body)
+    body = await request.json()
+    sample_ids = body.get("sampleIds", []) if isinstance(body, dict) else body
+    return project.get_model_results(modelId, sample_ids)
 
 
 @router.delete(
