@@ -129,12 +129,16 @@ class ProjectToExpose:
 
         columns = []
         for key, value in structure.items():
+            category = value["category"]
+            group = value.get("group", None)
             columns.append(
                 Column(
                     name=key,
+                    category=category,
+                    group=group,
                     metadata={
-                        "category": value["category"],
-                        "group": value.get("group", ""),
+                        "category": category,
+                        "group": group or "",
                     },
                     metrics=value.get("metrics", {}),
                     tags=[],
@@ -289,7 +293,7 @@ Expected dictionary format: {{"col_name": {{"type": text, "group": text}}}}.'
             name=self.project_name,
             dataProviderId="json_block",
             columns=columns,
-            expectedResults=results_columns if results_columns else [],
+            resultStructure=results_columns if results_columns else [],
             models=models,
             selections=[],
             metrics={
